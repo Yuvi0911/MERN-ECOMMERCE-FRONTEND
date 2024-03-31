@@ -1,11 +1,12 @@
-import { signInWithPopup } from 'firebase/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
-import  { useState } from 'react'
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FcGoogle } from 'react-icons/fc';
+import { useDispatch } from 'react-redux';
 import { auth } from '../firebase';
-import { useLoginMutation } from '../redux/api/userAPI';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import { getUser, useLoginMutation } from '../redux/api/userAPI';
+import { userExist, userNotExist } from '../redux/reducer/userReducer';
 import { MessageResponse } from '../types/api-types';
 
 const Login = () => {
@@ -15,11 +16,15 @@ const Login = () => {
 
     const [login] = useLoginMutation();
 
+    const dispatch = useDispatch();
+
 
     // is function ki help se hum firebase ka use kr k user ka authentication krvaye ge, yadi user nhi hoga toh hume firebase me googgle se sign in vale method ko enable kiya hua h us se information aa jaiye gi aur database me naya user ban jaiye ga
+
     const loginHandler = async () => {
         try {
             const provider = new GoogleAuthProvider();
+
             
             // await signInWithPopup(auth, provider);
             
@@ -35,17 +40,21 @@ const Login = () => {
                 _id: user.uid,
             })
 
+
             if("data" in res){
                 toast.success(res.data.message);
+                const data = await getUser(user.uid);
+                // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+                dispatch(userExist(data?.user!));
             }else{
                 const error = res.error as FetchBaseQueryError;
                 const message =( error.data as MessageResponse).message;
                 toast.error(message)
+                dispatch(userNotExist());
             }
             // console.log(user);
         }
         catch(error){
-            console.log("catch block");
             toast.error("Sign In Fail");
         }
     } 
