@@ -43,9 +43,12 @@ export const userAPI = createApi({
     }),
 });
 
+// jab bhi 404 axiosError aaye aur id mile jo ki not found h toh iska matlab ye h ki vo id firebase me exist krti h lekin mongodb me nhi h toh hum us id vale user ko firebase se delete kr dege. 
 export const getUser = async (id: string)=>{
     try{
+        // console.log("1");
         const {data}: {data: UserResponse} = await axios.get(`${import.meta.env.VITE_SERVER}/api/v1/user/${id}`)
+        // console.log("2");
         return data;
     }
     catch (error) {

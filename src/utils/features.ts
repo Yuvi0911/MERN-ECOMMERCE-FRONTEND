@@ -58,3 +58,10 @@ export const responseToast = (res: ResType, navigate: NavigateFunction | null, u
             last6Months,
         }
     }
+
+
+    // jab hum cloudinary se images ko la kr UI pr show krege toh hum hd quality me images ko show nhi krege balki images ki quality ko kam krdege is function ki help se.
+    export const transformImage = (url: string, width = 200) => {
+        const newUrl = url.replace("upload/", `upload/dpr_auto/w_${width}/`);
+        return newUrl;
+    };
